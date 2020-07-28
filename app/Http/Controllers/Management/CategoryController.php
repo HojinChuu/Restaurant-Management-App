@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Management;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Category;
 
 class CategoryController extends Controller
 {
@@ -12,9 +13,13 @@ class CategoryController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Category $category)
     {
-        return view('management.category');
+        $categories = $category->paginate(5);
+
+        return view('management.category')->with([
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -33,9 +38,18 @@ class CategoryController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request, Category $category)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:categories|max:255'
+        ]);
+
+        $category->name = $request->name;
+        $category->save();
+
+        $request->session()->flash('status', $request->name . " is save successfully");
+
+        return redirect()->route('category.index');
     }
 
     /**
@@ -57,7 +71,11 @@ class CategoryController extends Controller
      */
     public function edit($id)
     {
-        //
+        $category = Category::find($id);
+
+        return view('management.editCategory')->with([
+            'category' => $category
+        ]);
     }
 
     /**
@@ -69,7 +87,17 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'name' => 'required|unique:categories|max:255'
+        ]);
+
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->save();
+
+        $request->session()->flash('status', $request->name . " is updated successfully");
+
+        return redirect()->route('category.index');
     }
 
     /**
@@ -80,6 +108,9 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Category::destroy($id);
+        session()->flash('status', 'The category is deleted successfully');
+
+        return redirect()->route('category.index');
     }
 }

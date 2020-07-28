@@ -25,6 +25,43 @@
                     <i class="fas fa-plus"></i> Create Category
                 </a>
                 <hr>
+                @if (session()->has('status'))
+                    <div class="alert alert-success">
+                        <button type="button" class="close" data-dismiss="alert">x</button>
+                        {{ session()->get('status') }}
+                    </div>
+                @endif
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">ID</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Edit</th>
+                            <th scope="col">Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($categories as $category)
+                            <tr>
+                                <th scope="row">{{ $category->id }}</th>
+                                <td>{{ $category->name }}</td>
+                                <td>
+                                    <a href="/management/category/{{ $category->id }}/edit" class="btn btn-sm btn-block btn-outline-dark">
+                                        Edit
+                                    </a>
+                                </td>
+                                <td>
+                                    <form action="/management/category/{{ $category->id }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <input type="submit" value="Delete" class="btn btn-sm btn-block btn-outline-danger">
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                {{ $categories->links() }}
             </div>
         </div>
     </div>
