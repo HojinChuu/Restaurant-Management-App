@@ -14,7 +14,26 @@
                         </div>
                     @endif
 
-                    {{ __('You are logged in!') }}
+                    <div class="row text-center">
+                        <div class="col-sm-4">
+                            <a href="/management">
+                                <h4>관리자</h4>
+                                <img src="{{ asset('img/management.png') }}" width="80px">
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/cashier">
+                                <h4>계산대</h4>
+                                <img src="{{ asset('img/cashier.png') }}" width="80px">
+                            </a>
+                        </div>
+                        <div class="col-sm-4">
+                            <a href="/report">
+                                <h4>영수증</h4>
+                                <img src="{{ asset('img/report.png') }}" width="80px">
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
