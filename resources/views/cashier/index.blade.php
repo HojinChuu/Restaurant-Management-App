@@ -10,7 +10,16 @@
             </button>
         </div>
         <div class="col-md-7">
-
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    @foreach ($categories as $category)
+                        <a class="nav-item nav-link" data-id="{{ $category->id }}" data-toggle="tab">
+                            {{ $category->name }}
+                        </a>
+                    @endforeach
+                </div>
+            </nav>
+            <div id="list-menu" class="row mt-2"></div>
         </div>
     </div>
 </div>
@@ -33,6 +42,16 @@
                 $("#table-detail").slideUp('slow')
                 $("#btn-show-tables").html('View All Tables').removeClass('btn-danger').addClass('btn-primary')
             }
+        })
+
+        // load menus by category
+        $(".nav-link").click(function() {
+            // console.log(e.target.dataset.id)
+            $.get(`/cashier/getMenuByCategory/${$(this).data("id")}`, (data) => {
+                $("#list-menu").hide()
+                $("#list-menu").html(data)
+                $("#list-menu").fadeIn('fast')
+            })
         })
 
     })
