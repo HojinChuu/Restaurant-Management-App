@@ -64,6 +64,10 @@
             SELECTED_TABLE_ID = $(this).data("id")
             SELECTED_TABLE_NAME = $(this).data("name")
             $("#selected-table").html('<br><h3>Table: '+ SELECTED_TABLE_NAME +'</h3><hr>')
+
+            $.get("/cashier/getSaleDetailsByTable/" + SELECTED_TABLE_ID, function(data) {
+                $("#order-detail").html(data)
+            })
         })
 
         // menu click
@@ -89,6 +93,40 @@
                     }
                 })
             }
+        })
+
+        $("#order-detail").on('click', ".btn-confirm-order", function() {
+            var SaleID = $(this).data('id')
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "sale_id" : SaleID,
+                },
+                url: "/cashier/confirmOrderStatus",
+                success: function(data) {
+                    $("#order-detail").html(data)
+                }
+            })
+        })
+
+        $("#order-detail").on("click", ".btn-delete-saledetail", function() {
+            var saleDetailID = $(this).data("id")
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "saleDetail_id" : saleDetailID,
+                },
+                url: "/cashier/deleteSaleDetail",
+                success: function(data) {
+                    $("#order-detail").html(data)
+                }
+            })
         })
     })
 </script>
