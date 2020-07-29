@@ -173,7 +173,7 @@ class CashierController extends Controller
         $html .= '<h2>Total Amount : $ '. number_format($sale->total_price) .'</h2>';
         
         if($showBtnPayment) {
-            $html .= '<button data-id="'. $sale_id .'" class="btn btn-success btn-block btn-payment">Payment</button>';
+            $html .= '<button data-id="'. $sale_id .'" data-totalAmount="'. $sale->total_price .'" class="btn btn-success btn-block btn-payment" data-toggle="modal" data-target="#exampleModal">Payment</button>';
         } else {
             $html .= '<button data-id="'. $sale_id .'" class="btn btn-secondary btn-block btn-confirm-order">Confirm Order</button>';
         }
@@ -213,5 +213,26 @@ class CashierController extends Controller
         }
 
         return $html;
+    }
+
+    public function savePayment(Request $request)
+    {
+        $saleID = $request->saleID;
+        $recievedAmount = $request->recievedAmount;
+        $paymentType = $request->paymentType;
+
+        $sale = Sale::find($saleID);
+        $sale->total_recieved = $recievedAmount;
+        $sale->change = $recievedAmount - $sale->total_price;
+        $sale->payment_type = $paymentType;
+        $sale->sale_status = "paid";
+        $sale->save();
+
+        // update available
+        $table = Table::find($sale->table_id);
+        $table->status = "available";
+        $table->save();
+
+        return "/cashier";
     }
 }

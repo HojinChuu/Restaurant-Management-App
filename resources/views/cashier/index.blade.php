@@ -26,6 +26,41 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Payment</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="modal-body">
+        <h3 class="totalAmount"></h3>
+        <h3 class="changeAmount"></h3>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">$</span>
+            </div>
+            <input type="number" name="" id="recieved-amount" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="payment">Payment Type</label>
+            <select name="" id="payment-type" class="form-control">
+                <option value="cash">Cash</option>
+                <option value="credit card">Credit card</option>
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-save-payment" disabled>Save Payment</button>
+    </div>
+    </div>
+</div>
+</div>
+
 <script>
     $(document).ready(() => {
 
@@ -58,6 +93,7 @@
 
         var SELECTED_TABLE_ID = "";
         var SELECTED_TABLE_NAME = "";
+        var SALE_ID = "";
 
         // show table data
         $("#table-detail").on("click", ".btn-table", function() {
@@ -125,6 +161,53 @@
                 url: "/cashier/deleteSaleDetail",
                 success: function(data) {
                     $("#order-detail").html(data)
+                }
+            })
+        })
+
+        // click on the payment button
+        $("#order-detail").on("click", ".btn-payment", function() {
+            var totalAmount = $(this).attr('data-totalAmount')
+            $(".totalAmount").html("Total Amount " + totalAmount)
+            $('#recieved-amount').val('')
+            $(".changeAmount").html('')
+            SALE_ID = $(this).data('id')
+        })
+
+        // calcuate change
+        $("#recieved-amount").keyup(function() {
+            var totalAmount = $(".btn-payment").attr('data-totalAmount')
+            var recievedAmount = $(this).val()
+            var changeAmount = recievedAmount - totalAmount
+
+            $(".changeAmount").html("Total Change : $ " + changeAmount)
+
+            if(changeAmount >= 0) {
+                $('.btn-save-payment').prop('disabled', false)
+            } else {
+                $('.btn-save-payment').prop('disabled', true)
+            }
+        })
+
+        // save Payment
+        $(".btn-save-payment").click(function() {
+            var recievedAmount = $("#recieved-amount").val()
+            var paymentType = $("#payment-type").val()
+            var saleId = SALE_ID
+            
+            $.ajax({
+                type: "POST",
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                data: {
+                    "saleID": saleId,
+                    "recievedAmount": recievedAmount,
+                    "paymentType": paymentType
+                },
+                url: "/cashier/savePayment",
+                success: function(data) {
+                    window.location.href= data
                 }
             })
         })
